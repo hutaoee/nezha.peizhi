@@ -49,5 +49,4 @@
     enableLog: false           // 开启日志, 默认关闭
   };
 </script>
-<script src="https://raw.githubusercontent.com/hutaoee/nezha.peizhi/main/liuliang.js"></script>
-
+<script src="https://cdn.jsdelivr.net/gh/hutaoee/nezha.peizhi/liuliang.js"></script>
