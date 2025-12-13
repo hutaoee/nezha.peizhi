@@ -13,7 +13,6 @@
   window.CustomLogo = 'https://cdn.nodeimage.com/i/0JOl1NgDxmtzZBtKYvkkD89EUhhbi081.png'
   window.CustomDesc = '服务器监控'
   window.ShowNetTransfer = true
-  window.DisableAnimatedMan = false
   window.FixedTopServerName = true
   window.ForceCardInline = true
     /* 关掉人物插图 */
