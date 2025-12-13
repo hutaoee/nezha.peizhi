@@ -39,3 +39,9 @@
 <script src="https://cdn.jsdelivr.net/gh/hutaoee/nezha.peizhi/traffic-progress.js
 "></script>
 ```
+
+###### 详情与网络 展示在一个页面
+```html
+<script src="https://cdn.jsdelivr.net/gh/hutaoee/nezha.peizhi/nezha-custom.js
+"></script>
+```
