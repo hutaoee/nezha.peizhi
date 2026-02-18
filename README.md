@@ -4,7 +4,7 @@
 ```html
 <meta name="referrer" content="no-referrer">
 /* 自用的css格式 */
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hutaoee/nezha.peizhi/nezha-style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/hutaoee/nezha.peizhi@main/nezha-style.css">
 /* 自用的探针修改 */
 <script>
   window.CustomBackgroundImage = 'https://cdn.nodeimage.com/i/vbJdp0cG72gEQuKfFkei3SyNN8juPBLx.jpg'
@@ -34,10 +34,10 @@
     enableLog: false           // 开启日志, 默认关闭
   };
 </script>
-<script src="https://cdn.jsdelivr.net/gh/hutaoee/nezha.peizhi/traffic-progress.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/hutaoee/nezha.peizhi@main/traffic-progress.js"></script>
 ```
 
 ###### 详情与网络 展示在一个页面
 ```html
-<script src="https://cdn.jsdelivr.net/gh/hutaoee/nezha.peizhi/nezha-custom.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/hutaoee/nezha.peizhi@main/nezha-custom.js"></script>
 ```
