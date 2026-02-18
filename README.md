@@ -10,15 +10,14 @@
   window.CustomBackgroundImage = 'https://cdn.nodeimage.com/i/vbJdp0cG72gEQuKfFkei3SyNN8juPBLx.jpg'
   window.CustomMobileBackgroundImage = 'https://cdn.nodeimage.com/i/vbJdp0cG72gEQuKfFkei3SyNN8juPBLx.jpg'
   window.CustomLogo = 'https://cdn.nodeimage.com/i/0JOl1NgDxmtzZBtKYvkkD89EUhhbi081.png'
+    /* 自定义描述 */
   window.CustomDesc = '服务器监控'
-  window.ShowNetTransfer = true
-  window.FixedTopServerName = true
-  window.ForceCardInline = true
+    /* 卡片显示上下行流量 */
+    // window.ShowNetTransfer = "true";
     /* 关掉人物插图 */
     window.DisableAnimatedMan = "true";
  window.CustomLinks =
    '[{"link":"https://sms.788555.xyz/","name":"联系我"}]'
-  window.ForceTheme = 'light'
 </script>
 ```
 ###### 周期性流量进度条 
