@@ -1,47 +1,42 @@
 // ==UserScript==
+// @name         哪吒详情页布局调整
 // @version      2.1
-// @description  哪吒详情页展示网络+详情图表（网络在上）
-// @author       https://www.nodeseek.com/post-349102-1
+// @description  调整顺序为：1.服务器信息卡片, 2.网络图表, 3.详情图表
+// @author       Gemini
+// @match        *://*/*
+// @grant        none
 // ==/UserScript==
 
 (function () {
     'use strict';
 
-    const selectorNetworkButton =
-        '.server-info-tab .relative.cursor-pointer.text-stone-400.dark\\:text-stone-500';
-
-    const selectorTabSection =
-        '.server-info section.flex.items-center.my-2.w-full';
-
-    const selectorDetailCharts =
-        '.server-info > div:has(.server-charts)';
-
-    const selectorNetworkCharts =
-        '.server-info > div:nth-of-type(3)';
+    // 选择器定义
+    const selectorTabSection = '.server-info section.flex.items-center.my-2.w-full';
+    const selectorNetworkButton = '.server-info-tab .relative.cursor-pointer.text-stone-400.dark\\:text-stone-500';
+    
+    // 容器选择器（基于你的要求：1是卡片，2是详情，3是网络）
+    // 调整后：我们要把原本在第3位的网络图表移动到第2位
+    const selectorDetailCharts = '.server-info > div:nth-of-type(2)'; 
+    const selectorNetworkCharts = '.server-info > div:nth-of-type(3)';
 
     let hasClicked = false;
-    let divVisible = false;
-    let hasReordered = false;
 
-    function forceBothVisible() {
+    // 核心功能：调整 DOM 顺序并显示
+    function reorderAndShow() {
         const detailDiv = document.querySelector(selectorDetailCharts);
         const networkDiv = document.querySelector(selectorNetworkCharts);
+        const container = document.querySelector('.server-info');
 
-        if (detailDiv) detailDiv.style.display = 'block';
-        if (networkDiv) networkDiv.style.display = 'block';
-    }
+        if (detailDiv && networkDiv && container) {
+            // 关键动作：将网络图表插入到详情图表之前
+            if (networkDiv.nextSibling === detailDiv || detailDiv.previousSibling !== networkDiv) {
+                container.insertBefore(networkDiv, detailDiv);
+                console.log('[UserScript] 已交换顺序：网络图表在前');
+            }
 
-    function reorderCharts() {
-        if (hasReordered) return;
-
-        const detailDiv = document.querySelector(selectorDetailCharts);
-        const networkDiv = document.querySelector(selectorNetworkCharts);
-
-        if (detailDiv && networkDiv && detailDiv.parentNode) {
-            // 把网络图表插入到详情图表前面
-            detailDiv.parentNode.insertBefore(networkDiv, detailDiv);
-            hasReordered = true;
-            console.log('[UserScript] 图表顺序已调整：网络在上');
+            // 强制两者显示
+            detailDiv.style.display = 'block';
+            networkDiv.style.display = 'block';
         }
     }
 
@@ -55,17 +50,17 @@
         if (btn && !hasClicked) {
             btn.click();
             hasClicked = true;
-            setTimeout(() => {
-                forceBothVisible();
-                reorderCharts();
-            }, 500);
+            console.log('[UserScript] 已激活网络数据加载');
+            // 点击后等待数据加载并重新排序
+            setTimeout(reorderAndShow, 300);
         }
     }
 
-    function tryClickPeak(retryCount = 10, interval = 200) {
+    function tryClickPeak(retryCount = 15, interval = 200) {
         const peakBtn = document.querySelector('#Peak');
         if (peakBtn) {
             peakBtn.click();
+            console.log('[UserScript] 已开启 Peak 视图');
         } else if (retryCount > 0) {
             setTimeout(() => tryClickPeak(retryCount - 1, interval), interval);
         }
@@ -75,28 +70,16 @@
         const detailDiv = document.querySelector(selectorDetailCharts);
         const networkDiv = document.querySelector(selectorNetworkCharts);
 
-        const isDetailVisible =
-            detailDiv && getComputedStyle(detailDiv).display !== 'none';
-        const isNetworkVisible =
-            networkDiv && getComputedStyle(networkDiv).display !== 'none';
-
-        const isAnyDivVisible = isDetailVisible || isNetworkVisible;
-
-        if (isAnyDivVisible && !divVisible) {
+        // 如果检测到图表容器存在
+        if (detailDiv || networkDiv) {
             hideTabSection();
             tryClickNetworkButton();
-            setTimeout(() => tryClickPeak(15, 200), 300);
-        } else if (!isAnyDivVisible && divVisible) {
-            hasClicked = false;
-        }
-
-        divVisible = isAnyDivVisible;
-
-        if (detailDiv && networkDiv) {
-            if (!isDetailVisible || !isNetworkVisible) {
-                forceBothVisible();
+            reorderAndShow();
+            
+            // 首次运行时尝试点击 Peak
+            if (hasClicked) {
+                tryClickPeak(1, 0); 
             }
-            reorderCharts();
         }
     });
 
@@ -104,10 +87,8 @@
     if (root) {
         observer.observe(root, {
             childList: true,
-            attributes: true,
-            subtree: true,
-            attributeFilter: ['style', 'class']
+            subtree: true
         });
-        console.log('[UserScript] 观察器已启动（网络在上版本）');
+        console.log('[UserScript] 排序观察器已启动');
     }
 })();
