@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         哪吒详情页布局调整
-// @version      2.1
+// @version      2.11
 // @description  调整顺序为：1.服务器信息卡片, 2.网络图表, 3.详情图表
 // @author       Gemini
 // @match        *://*/*
