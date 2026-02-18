@@ -1,53 +1,49 @@
 // ==UserScript==
-// @version      2.1
-// @description  哪吒详情页展示网络+详情图表（网络在上）
+// @version      2.0
+// @description  哪吒详情页直接展示网络波动卡片（适配新版HTML结构）
 // @author       https://www.nodeseek.com/post-349102-1
 // ==/UserScript==
 
 (function () {
     'use strict';
 
-    const selectorNetworkButton =
-        '.server-info-tab .relative.cursor-pointer.text-stone-400.dark\\:text-stone-500';
+    // "网络" 按钮选择器：未激活状态下的 Tab 按钮（灰色文字）
+    const selectorNetworkButton = '.server-info-tab .relative.cursor-pointer.text-stone-400.dark\\:text-stone-500';
 
-    const selectorTabSection =
-        '.server-info section.flex.items-center.my-2.w-full';
+    // Tab 切换区域的 section 选择器（包含"详情"和"网络"按钮的区域）
+    const selectorTabSection = '.server-info section.flex.items-center.my-2.w-full';
 
-    const selectorDetailCharts =
-        '.server-info > div:has(.server-charts)';
+    // 详情图表视图 - 包含 server-charts 的 div
+    const selectorDetailCharts = '.server-info > div:has(.server-charts)';
 
-    const selectorNetworkCharts =
-        '.server-info > div:nth-of-type(3)';
+    // 网络图表视图 - 紧跟在详情图表后面的 div（通常是隐藏的）
+    // div顺序：1=服务器信息卡片, 2=详情图表, 3=网络图表
+    const selectorNetworkCharts = '.server-info > div:nth-of-type(3)';
 
     let hasClicked = false;
     let divVisible = false;
-    let hasReordered = false;
 
     function forceBothVisible() {
+        // 使用更精确的选择器找到详情和网络两个视图
         const detailDiv = document.querySelector(selectorDetailCharts);
         const networkDiv = document.querySelector(selectorNetworkCharts);
 
-        if (detailDiv) detailDiv.style.display = 'block';
-        if (networkDiv) networkDiv.style.display = 'block';
-    }
-
-    function reorderCharts() {
-        if (hasReordered) return;
-
-        const detailDiv = document.querySelector(selectorDetailCharts);
-        const networkDiv = document.querySelector(selectorNetworkCharts);
-
-        if (detailDiv && networkDiv && detailDiv.parentNode) {
-            // 把网络图表插入到详情图表前面
-            detailDiv.parentNode.insertBefore(networkDiv, detailDiv);
-            hasReordered = true;
-            console.log('[UserScript] 图表顺序已调整：网络在上');
+        if (detailDiv) {
+            detailDiv.style.display = 'block';
+            console.log('[UserScript] 详情图表已显示');
+        }
+        if (networkDiv) {
+            networkDiv.style.display = 'block';
+            console.log('[UserScript] 网络图表已显示');
         }
     }
 
     function hideTabSection() {
         const section = document.querySelector(selectorTabSection);
-        if (section) section.style.display = 'none';
+        if (section) {
+            section.style.display = 'none';
+            console.log('[UserScript] Tab 切换区域已隐藏');
+        }
     }
 
     function tryClickNetworkButton() {
@@ -55,10 +51,8 @@
         if (btn && !hasClicked) {
             btn.click();
             hasClicked = true;
-            setTimeout(() => {
-                forceBothVisible();
-                reorderCharts();
-            }, 500);
+            console.log('[UserScript] 已点击网络按钮');
+            setTimeout(forceBothVisible, 500);
         }
     }
 
@@ -66,6 +60,7 @@
         const peakBtn = document.querySelector('#Peak');
         if (peakBtn) {
             peakBtn.click();
+            console.log('[UserScript] 已点击 Peak 按钮');
         } else if (retryCount > 0) {
             setTimeout(() => tryClickPeak(retryCount - 1, interval), interval);
         }
@@ -75,10 +70,8 @@
         const detailDiv = document.querySelector(selectorDetailCharts);
         const networkDiv = document.querySelector(selectorNetworkCharts);
 
-        const isDetailVisible =
-            detailDiv && getComputedStyle(detailDiv).display !== 'none';
-        const isNetworkVisible =
-            networkDiv && getComputedStyle(networkDiv).display !== 'none';
+        const isDetailVisible = detailDiv && getComputedStyle(detailDiv).display !== 'none';
+        const isNetworkVisible = networkDiv && getComputedStyle(networkDiv).display !== 'none';
 
         const isAnyDivVisible = isDetailVisible || isNetworkVisible;
 
@@ -92,11 +85,11 @@
 
         divVisible = isAnyDivVisible;
 
+        // 确保两个视图都可见
         if (detailDiv && networkDiv) {
             if (!isDetailVisible || !isNetworkVisible) {
                 forceBothVisible();
             }
-            reorderCharts();
         }
     });
 
@@ -108,6 +101,6 @@
             subtree: true,
             attributeFilter: ['style', 'class']
         });
-        console.log('[UserScript] 观察器已启动（网络在上版本）');
+        console.log('[UserScript] 观察器已启动');
     }
 })();
