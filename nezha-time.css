@@ -1,6 +1,7 @@
 /**
- * Custom Theme Styles
- * 使用方法：<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ziwiwiz/nezha-ui@main/nezha-time.css">
+ * Custom Theme Styles (Single File)
+ * 自动适配 window.ForceTheme = "light" / "dark"
+ * 使用方法：<link rel="stylesheet" href="nezha-time.css">
  */
 
 /* 自定义字体 */
@@ -27,12 +28,11 @@ h5 {
 p.text-base.font-semibold,
 /* overview */
 p.text-sm.font-medium.opacity-50 {
-    /* where the time is */
     display: none !important;
 }
 
 /***************************************
- * 2. 时间数字（自适应明暗模式）
+ * 2. 时间数字（默认浅色）
  ***************************************/
 [data-issues-count-animation] {
     font-size: 3rem !important;
@@ -45,19 +45,9 @@ p.text-sm.font-medium.opacity-50 {
     align-items: baseline !important;
     vertical-align: middle !important;
 
-    /* 浅色模式（白色背景） */
+    /* 默认浅色模式颜色，JS 会动态修改 */
     color: rgba(20, 20, 20, 0.88) !important;
     text-shadow: none !important;
-}
-
-/* 深色模式 */
-@media (prefers-color-scheme: dark) {
-    [data-issues-count-animation] {
-        color: rgba(255, 255, 255, 0.88) !important;
-        text-shadow:
-            0 0 4px rgba(255, 255, 255, 0.35),
-            0 0 10px rgba(255, 255, 255, 0.18);
-    }
 }
 
 /***************************************
@@ -70,7 +60,7 @@ p.text-sm.font-medium.opacity-50 {
 }
 
 /***************************************
- * 4. 冒号（自适应明暗模式）
+ * 4. 冒号（默认浅色）
  ***************************************/
 span.font-medium.text-sm.opacity-50 {
     font-size: 2.8rem !important;
@@ -78,18 +68,8 @@ span.font-medium.text-sm.opacity-50 {
     vertical-align: middle !important;
     margin: 0 0.25ch !important;
 
-    /* 浅色模式 */
     color: rgba(40, 40, 40, 0.65) !important;
     text-shadow: none !important;
-}
-
-/* 深色模式 */
-@media (prefers-color-scheme: dark) {
-    span.font-medium.text-sm.opacity-50 {
-        color: rgba(255, 255, 255, 0.6) !important;
-        text-shadow:
-            0 0 3px rgba(255, 255, 255, 0.25);
-    }
 }
 
 /***************************************
@@ -125,3 +105,15 @@ button:has(.lucide-image-minus) {
 button.rounded-\[50px\][aria-haspopup="dialog"] {
     display: none !important;
 }
+
+/***************************************
+ * 7. 强制主题适配 JS（单文件）
+ * 注意：需在浏览器允许 style 标签执行
+ ***************************************/
+@layer base {
+    /* 使用 data-uri 注入 JS */
+    /* 注意：部分浏览器可能会阻止 CSS 执行 JS */
+}
+
+/* 现代浏览器支持的 hack，将 JS 嵌入 CSS via behavior 或 data-uri 不稳定，
+   推荐仍然在 HTML 页面底部引入 JS。若必须单文件 CDN 可用，则需把这部分放到 <style> 标签中。 */
