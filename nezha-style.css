@@ -17,21 +17,25 @@ img {
   border: none;
 }
 
-/* 背景图片压暗和模糊, 开了背景图建议开启 */
+/* 背景图片压暗和模糊 - 增加 iOS 兼容前缀 */
 .dark .bg-cover::after {
   content: "";
   position: absolute;
   inset: 0;
+  -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
   background-color: rgba(0, 0, 0, 0.3);
+  z-index: -1;
 }
 
 .light .bg-cover::after {
   content: "";
   position: absolute;
   inset: 0;
+  -webkit-backdrop-filter: blur(3px);
   backdrop-filter: blur(3px);
   background-color: rgba(255, 255, 255, 0.3);
+  z-index: -1;
 }
 
 .text-green-600 {
@@ -51,28 +55,32 @@ img[alt="BackIcon"] {
   margin-right: 12px;
 }
 
+/* 顶部导航/搜索框模糊修复 */
 .flex.items-center.gap-1.rounded-\[50px\].bg-stone-100.p-\[3px\].dark\:bg-stone-800 {
+  -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 .data-\[state\=unchecked\]\:bg-input[data-state=unchecked] {
   background-color: unset;
 }
 
-/* Light Mode */
+/* --- Light Mode --- */
 .light .bg-card {
   font-family: "Roboto", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
   position: relative;
-  /* 设置元素为相对定位 */
   background-color: var(--custom-background-color);
   border: 1px solid var(--custom-border-color);
+  /* iOS 兼容性核心修复 */
+  -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
   border-radius: 15px;
-  /* 设置边框圆角为15像素 */
   overflow: hidden;
-  /* 确保内容不会溢出容器 */
   box-shadow: 0 4px 6px var(--custom-boxshadow-color);
-  /* 设置阴影 */
 }
 
 .light .focus\:text-accent-foreground:focus {
@@ -118,7 +126,7 @@ html.light body {
 }
 
 .bg-white:is(.light *) {
-  background-color: var(--custom-boxshadow-color)
+  background-color: var(--custom-boxshadow-color);
 }
 
 .light .bg-border {
@@ -139,11 +147,16 @@ html.light body {
 
 .light div#radix-\:r4\: {
   background: rgba(255, 255, 255, 0.7);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
 }
 
 .light .max-w-5xl.gap-4>div:first-child {
   background-color: var(--custom-background-color);
+  -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
   border: 1px solid var(--custom-boxshadow-color);
   box-shadow: 0 4px 6px var(--custom-boxshadow-color);
   border-radius: 12px;
@@ -170,28 +183,25 @@ html.light body {
   background-color: var(--custom-boxshadow-color);
 }
 
-.light .font-medium.opacity-40 {
-  opacity: unset;
-}
-
+.light .font-medium.opacity-40,
 .light .font-medium.opacity-50 {
   opacity: unset;
 }
 
-/* Dark Mode */
+/* --- Dark Mode --- */
 .dark .bg-card {
   font-family: "Roboto", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
   position: relative;
-  /* 设置元素为相对定位 */
   background-color: var(--custom-background-color-dark);
   border: 1px solid var(--custom-border-color-dark);
+  /* iOS 兼容性核心修复 */
+  -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
   border-radius: 15px;
-  /* 设置边框圆角为15像素 */
   overflow: hidden;
-  /* 确保内容不会溢出容器 */
   box-shadow: 0 4px 6px var(--custom-boxshadow-color-dark);
-  /* 设置阴影 */
 }
 
 .dark .focus\:text-accent-foreground:focus {
@@ -237,7 +247,7 @@ html.dark body {
 }
 
 .dark\:bg-black:is(.dark *) {
-  background-color: var(--custom-boxshadow-color-dark)
+  background-color: var(--custom-boxshadow-color-dark);
 }
 
 .dark .bg-border {
@@ -258,11 +268,16 @@ html.dark body {
 
 .dark div#radix-\:r4\: {
   background: rgba(0, 0, 0, 0.7);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
 }
 
 .dark .max-w-5xl.gap-4>div:first-child {
   background-color: var(--custom-background-color-dark);
+  -webkit-backdrop-filter: blur(2px);
   backdrop-filter: blur(2px);
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
   border: 1px solid var(--custom-boxshadow-color-dark);
   box-shadow: 0 4px 6px var(--custom-boxshadow-color-dark);
   border-radius: 12px;
@@ -289,10 +304,7 @@ html.dark body {
   background-color: var(--custom-boxshadow-color-dark);
 }
 
-.dark .font-medium.opacity-40 {
-  opacity: unset;
-}
-
+.dark .font-medium.opacity-40,
 .dark .font-medium.opacity-50 {
   opacity: unset;
 }
