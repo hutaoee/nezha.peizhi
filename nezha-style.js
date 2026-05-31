@@ -3,7 +3,8 @@
     const css = `
         @font-face {
             font-family: 'Douyin Sans';
-            src: url('https://github.com/hutaoee/nezha.peizhi/raw/refs/heads/main/DouyinSansBold.ttf') format('truetype');
+            /* 顺手帮你把字体也修复成了 CDN 加速链接，防止直连被拒 */
+            src: url('https://cdn.jsdelivr.net/gh/hutaoee/nezha.peizhi@main/DouyinSansBold.ttf') format('truetype');
             font-display: swap;
         }
         * { 
@@ -24,20 +25,24 @@
             background-color: rgba(255, 255, 255, 0.2); 
         }
 
-        /* 卡片去颗粒感（降低模糊，优化饱和度） */
+        /* 【精调】优化卡片模糊度与高饱和度，营造高级通透感 */
         [class*="bg-card"], .bottom-marquee, .max-w-5xl.gap-4>div:first-child {
-            backdrop-filter: blur(3px) saturate(140%) !important;
-            -webkit-backdrop-filter: blur(2px) saturate(140%) !important;
+            backdrop-filter: blur(6px) saturate(150%) !important;
+            -webkit-backdrop-filter: blur(4px) saturate(150%) !important;
             border-radius: 16px !important;
             position: relative !important;
             overflow: hidden !important;
         }
+        
+        /* 【精调】深色模式卡片：提高底色厚度（0.3 -> 0.58），质感更扎实不凌乱 */
         html.dark [class*="bg-card"], html.dark .bottom-marquee, html.dark .max-w-5xl.gap-4>div:first-child {
-            background-color: rgba(20, 20, 20, 0.3) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            background-color: rgba(15, 15, 15, 0.58) !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
         }
+        
+        /* 【精调】浅色模式卡片：大幅加白（0.5 -> 0.72），像干净的白纱，文字极度清晰 */
         html.light [class*="bg-card"], html.light .bottom-marquee, html.light .max-w-5xl.gap-4>div:first-child {
-            background-color: rgba(255, 255, 255, 0.5) !important; 
+            background-color: rgba(255, 255, 255, 0.72) !important; 
             border: 1px solid rgba(255, 255, 255, 0.5) !important;
         }
 
