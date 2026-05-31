@@ -4,7 +4,7 @@
    ========================================== */
 @font-face {
     font-family: 'Douyin Sans';
-    src: url('https://cdn.jsdelivr.net/gh/bytedance/fonts@main/DouyinSans/DouyinSansBold.ttf') format('truetype');
+    src: url('https://github.com/hutaoee/nezha.peizhi/raw/refs/heads/main/DouyinSansBold.ttf') format('truetype');
     font-display: swap;
 }
 * { 
