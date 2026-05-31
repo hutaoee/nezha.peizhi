@@ -1,181 +1,479 @@
-:root {
-  /* 统一调整为安卓那种带有 0.7 透明度的乳白色/乳黑色底框 */
-  --custom-border-color: rgba(244, 244, 244, 0.4) !important;
-  --custom-boxshadow-color: rgba(0, 0, 0, 0.05) !important;
-  --custom-background-color: rgba(245, 245, 245, 0.7) !important;
-  
-  --custom-border-color-dark: rgba(11, 11, 11, 0.4) !important;
-  --custom-boxshadow-color-dark: rgba(0, 0, 0, 0.2) !important;
-  --custom-background-color-dark: rgba(20, 20, 20, 0.75) !important;
-  --custom-background-image: unset !important;
+<!DOCTYPE html> 
+<html lang=“zh-CN”> 
+<head> 
+<meta charset=“UTF-8” /> 
+<meta name=“viewport” content=“width=device-width, initial-scale=1.0” /> <title>哪吒探针 + 鼠标碎玻璃特效+服务器页签流量显示</title>
+ 
+<style> /* 设置全局字体为苹方，增加文字白色阴影增强可读性 */ * { font-family: ‘PingFang SC’, ‘Helvetica Neue’, Helvetica, Arial, sans-serif !important; font-size: 16px; text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.9);-webkit-text-fill-color: white; }
+ 
+/* 设置页面背景为一张图片，全屏覆盖 */
+html, body {
+  height: 100% !important;
+  background: url("替换为你想要自定义的图片地址") no-repeat center center fixed !important;
+  background-size: cover !important;
+  margin: 0;
 }
-
-/* ==========================================
-   【核心修正】彻底封杀 iOS 16 的任何毛玻璃模糊
-   ========================================== */
-*, *::before, *::after {
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  filter: none !important;
+#root{
+    background-color: transparent !important;
 }
-
-/* 强力拆除 Tailwind 所有的模糊变量，只留透明，不留模糊 */
-[class*="backdrop-blur"] {
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  filter: none !important;
-  --tw-backdrop-blur: unset !important;
+/* 卡片透明并带模糊效果 */
+.rounded-lg{
+    backdrop-filter: blur(4px)!important;
+  background-color: transparent !important;
+  box-shadow: none !important;
 }
-
-#root {
-  background-color: unset !important;
+.bg-white{
+    backdrop-filter: blur(4px)!important;
+  background-color: transparent !important;
+  box-shadow: none !important;
 }
-
-img {
+.flex {
+    background-color: transparent !important;
+}
+.bg-card{
+    background-color: transparent !important;
+}
+ 
+/* 替换左上角 Logo 图标 */
+img[src*="/apple-touch-icon.png"] {
+  content: url("替换为你想要使用的图标") !important;
+}
+ 
+/* 去除页面底部页脚 */
+footer {
+  display: none !important;
+}
+ 
+/* 主内容容器设置为半透明背景 */
+.el-container {
+  background-color: rgba(255, 255, 255, 0.7) !important;
+}
+ 
+/* 卡片、弹窗等组件设置更高透明度的背景 */
+.el-card, .el-message-box, .el-dialog {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+ 
+/* 深色文字设置白色阴影增强对比度 */
+.el-text, .el-button, .el-table, .el-form-item__label, .el-form-item__content, .el-menu-item, .el-submenu__title {
+  color: #333 !important;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+ 
+/* 浅色文字设置黑色阴影提升可视性 */
+.el-text-light, .el-button--text, .el-link {
+  color: #fff !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+ 
+/* 碎玻璃特效碎片样式 */
+.fragment {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background-color: rgba(255, 255, 255, 0.8);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  transform-origin: center;
+  animation: shatter 1.5s ease-out forwards;
+  pointer-events: none;
+}
+ 
+/* 碎玻璃动画关键帧 */
+@keyframes shatter {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy)) rotate(var(--angle)) scale(0.5);
+    opacity: 0;
+  }
+}
+ 
+/* 返回顶部按钮样式 */
+#backToTop {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 1000;
+  background-color: transparent;
+  color: white;
   border: none;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.3s, transform 0.3s;
+  display: none;
 }
-
-/* 背景大图压暗层：保持透明，禁止模糊 */
-.dark .bg-cover::after { 
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-color: rgba(0, 0, 0, 0.4) !important; 
+//覆写内容宽度
+.w-full {
+    max-width: 75rem !important;
 }
-.light .bg-cover::after { 
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-color: rgba(255, 255, 255, 0.15) !important; 
+ 
+#backToTop:hover {
+  transform: scale(1.1);
 }
-
-.text-green-600 { color: rgb(34, 197, 94); }
-.bg-green-600 { background-color: rgb(34, 197, 94); }
-.vps-info { border-radius: 12px; padding: 12px; }
-img[alt="BackIcon"] { margin-right: 12px; }
-
-/* 顶部导航与搜索框 */
-.flex.items-center.gap-1.rounded-\[50px\].bg-stone-100.p-\[3px\].dark\:bg-stone-800 {
-  background-color: var(--custom-background-color) !important;
+ 
+#backToTop::before {
+  content: "🚀";
+  font-size: 24px;
+  display: block;
+  line-height: 60px;
+  text-align: center;
 }
+  .mt-4.w-full.mx-auto > div {
+    display: none;
+  }
+</style>
+ </head> 
+<body>
+ 
+<!-- 返回顶部按钮 --> <button id=“backToTop”></button>
+ 
+  <script>
+  //禁用动画小人
+    window.DisableAnimatedMan = true;
+    document.addEventListener('click', function(e) {
+      createShatterEffect(e.pageX, e.pageY);
+    });
+ //点击碎片特效
+    function createShatterEffect(x, y) {
+      const fragmentCount = 20;
+      for (let i = 0; i < fragmentCount; i++) {
+        const fragment = document.createElement('div');
+        fragment.className = 'fragment';
+        
+        const angle = Math.random() * 360;
+        const distance = Math.random() * 200 + 50;
+        const dx = Math.cos((angle * Math.PI) / 180) * distance;
+        const dy = Math.sin((angle * Math.PI) / 180) * distance;
+ 
+        fragment.style.left = `${x}px`;
+        fragment.style.top = `${y}px`;
+        fragment.style.setProperty('--dx', `${dx}px`);
+        fragment.style.setProperty('--dy', `${dy}px`);
+        fragment.style.setProperty('--angle', `${Math.random() * 720}deg`);
+        document.body.appendChild(fragment);
+        setTimeout(() => fragment.remove(), 1500);
+      }
+    }
+//隐藏数据
+const observer = new MutationObserver(mutations => {
+  document.querySelectorAll('span[data-current-value]').forEach(el => {
+    if(!el.dataset.processed) {
+      el.style.opacity = "0";
+      el.dataset.processed = true;
+    }
+  });
+});
+observer.observe(document.body, { childList: true, subtree: true });
+//卡面添加流量统计
+  window.ShowNetTransfer = "true";
+  ; (function () {
+    let trafficTimer = null;
+    let trafficCache = null;
+ 
+    const config = {
+      showTrafficStats: true,
+      insertPosition: 'replace', // 可选：'after', 'before', 'replace'
+      interval: 60000,           // 60秒刷新周期
+      style: 1
+    };
+ 
+    function formatFileSize(bytes) {
+      if (bytes === 0) return { value: '0', unit: 'B' };
+      const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+      let unitIndex = 0;
+      let size = bytes;
+      while (size >= 1024 && unitIndex < units.length - 1) {
+        size /= 1024;
+        unitIndex++;
+      }
+      return {
+        value: size.toFixed(unitIndex === 0 ? 0 : 2),
+        unit: units[unitIndex]
+      };
+    }
+ 
+    function calculatePercentage(used, total) {
+      used = Number(used);
+      total = Number(total);
+      if (used > 1e15 || total > 1e15) {
+        used /= 1e10;
+        total /= 1e10;
+      }
+      return (used / total * 100).toFixed(1);
+    }
+ 
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    }
+ 
+    function safeSetTextContent(parent, selector, text) {
+      const el = parent.querySelector(selector);
+      if (el) {
+        el.textContent = text;
+      }
+    }
+    // 返回进度条颜色：绿色（0%）到红色（100%）
+    function getGradientColor(percentage) {
+      const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
+      const lerp = (start, end, t) => Math.round(start + (end - start) * t);
+      const p = clamp(Number(percentage), 0, 100) / 100;
+      const startColor = { r: 16, g: 185, b: 129 }; // #10b981
+      const endColor = { r: 239, g: 68, b: 68 };  // #ef4444
+      const r = lerp(startColor.r, endColor.r, p);
+      const g = lerp(startColor.g, endColor.g, p);
+      const b = lerp(startColor.b, endColor.b, p);
+      return `rgb(${r}, ${g}, ${b})`;
+    }
+ 
+    function renderTrafficStats(trafficData) {
+      const serverMap = new Map();
+ 
+      for (const cycleId in trafficData) {
+        const cycle = trafficData[cycleId];
+        if (!cycle.server_name || !cycle.transfer) continue;
+ 
+        for (const serverId in cycle.server_name) {
+          const serverName = cycle.server_name[serverId];
+          const transfer = cycle.transfer[serverId];
+          const max = cycle.max;
+          const from = cycle.from;
+          const to = cycle.to;
+          const next_update = cycle.next_update[serverId];
+ 
+          if (serverName && transfer !== undefined && max && from && to) {
+            serverMap.set(serverName, {
+              id: serverId,
+              transfer: transfer,
+              max: max,
+              name: cycle.name,
+              from: from,
+              to: to,
+              next_update: next_update
+            });
+          }
+        }
+      }
+ 
+      serverMap.forEach((serverData, serverName) => {
+        const targetElement = Array.from(document.querySelectorAll('section.grid.items-center.gap-2'))
+          .find(section => {
+            const firstText = section.querySelector('p.break-all.font-bold.tracking-tight.text-xs')?.textContent.trim();
+            return firstText === serverName;
+          });
+        if (!targetElement) {
+          //console.warn(`[renderTrafficStats] 未找到服务器 "${serverName}" (ID: ${serverData.id}) 的元素`);
+          return;
+        }
+ 
+        const usedFormatted = formatFileSize(serverData.transfer);
+        const totalFormatted = formatFileSize(serverData.max);
+        const percentage = calculatePercentage(serverData.transfer, serverData.max);
+        const fromFormatted = formatDate(serverData.from);
+        const toFormatted = formatDate(serverData.to);
+        const next_update = new Date(serverData.next_update).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
+        const uniqueClassName = 'traffic-stats-for-server-' + serverData.id;
+        const progressColor = getGradientColor(percentage);
+        let insertPosition = config.insertPosition;
+ 
+        const containerDiv = targetElement.closest('div');
+        if (!containerDiv) return;
+ 
+        const existing = Array.from(containerDiv.querySelectorAll('.new-inserted-element')).find(el =>
+          el.classList.contains(uniqueClassName)
+        );
+        if (!config.showTrafficStats) {
+          if (existing) existing.remove();
+          return;
+        }
+ 
+        if (existing) {
+          safeSetTextContent(existing, '.used-traffic', usedFormatted.value);
+          safeSetTextContent(existing, '.used-unit', usedFormatted.unit);
+          safeSetTextContent(existing, '.total-traffic', totalFormatted.value);
+          safeSetTextContent(existing, '.total-unit', totalFormatted.unit);
+          safeSetTextContent(existing, '.from-date', fromFormatted);
+          safeSetTextContent(existing, '.to-date', toFormatted);
+          safeSetTextContent(existing, '.percentage-value', percentage + '%');
+          safeSetTextContent(existing, '.next-update', `next update: ${next_update}`);
+          const progressBar = existing.querySelector('.progress-bar');
+          if (progressBar) {
+            progressBar.style.width = percentage + '%';
+            progressBar.style.backgroundColor = progressColor;
+          }
+          console.log(`[renderTrafficStats] 更新已存在的流量条目: ${serverName}`);
+        }
+        else {
+          let oldSection = containerDiv.querySelector('section.flex.items-center.w-full.justify-between.gap-1');
+          if (!oldSection) {
+            oldSection = containerDiv.querySelector('section.grid.items-center.gap-3');
+            insertPosition = 'after';
+          }
+          if (!oldSection) return;
+ 
+          const newElement = document.createElement('div');
+          newElement.classList.add('space-y-1.5', 'new-inserted-element', uniqueClassName);
+          newElement.style.width = '100%';
+          if (config.style === 1) {
+            newElement.innerHTML = `
+                <div class="flex items-center justify-between">
+                  <div class="flex items-baseline gap-1">
+                    <span class="text-[10px] font-medium text-neutral-800 dark:text-neutral-200 used-traffic">${usedFormatted.value}</span>
+                    <span class="text-[10px] font-medium text-neutral-800 dark:text-neutral-200 used-unit">${usedFormatted.unit}</span>
+                    <span class="text-[10px] text-neutral-500 dark:text-neutral-400">/ </span>
+                    <span class="text-[10px] text-neutral-500 dark:text-neutral-400 total-traffic">${totalFormatted.value}</span>
+                    <span class="text-[10px] text-neutral-500 dark:text-neutral-400 total-unit">${totalFormatted.unit}</span>
+                  </div>
+                  <div class="text-[10px] font-medium text-neutral-600 dark:text-neutral-300">
+                    <span class="from-date">${fromFormatted}</span>
+                    <span class="text-neutral-500 dark:text-neutral-400">-</span>
+                    <span class="to-date">${toFormatted}</span>
+                  </div>
+                </div>
+                <div class="relative h-1.5">
+                  <div class="absolute inset-0 bg-neutral-100 dark:bg-neutral-800 rounded-full"></div>
+                  <div class="absolute inset-0 bg-emerald-500 rounded-full transition-all duration-300 progress-bar" style="width: ${percentage}%; background-color: ${progressColor};"></div>
+                </div>
+              `;
+          } else if (config.style === 2) {
+            newElement.innerHTML = `
+                <div class="flex items-center justify-between">
+                  <div class="flex items-baseline gap-1">
+                    <span class="text-[10px] font-medium text-neutral-800 dark:text-neutral-200 used-traffic">${usedFormatted.value}</span>
+                    <span class="text-[10px] font-medium text-neutral-800 dark:text-neutral-200 used-unit">${usedFormatted.unit}</span>
+                    <span class="text-[10px] text-neutral-500 dark:text-neutral-400">/ </span>
+                    <span class="text-[10px] text-neutral-500 dark:text-neutral-400 total-traffic">${totalFormatted.value}</span>
+                    <span class="text-[10px] text-neutral-500 dark:text-neutral-400 total-unit">${totalFormatted.unit}</span>
+                  </div>
+                  <span class="text-[10px] text-neutral-500 dark:text-neutral-400 percentage-value">${percentage}%</span>
+                </div>
+                <div class="relative h-1.5">
+                  <div class="absolute inset-0 bg-neutral-100 dark:bg-neutral-800 rounded-full"></div>
+                  <div class="absolute inset-0 bg-emerald-500 rounded-full transition-all duration-300 progress-bar" style="width: ${percentage}%; background-color: ${progressColor};"></div>
+                </div>
+                <div class="flex items-center justify-between">
+                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400">
+                    <span class="from-date">${fromFormatted}</span>
+                    <span class="text-neutral-500 dark:text-neutral-400">-</span>
+                    <span class="to-date">${toFormatted}</span>
+                  </div>
+                  <span class="text-[10px] text-neutral-500 dark:text-neutral-400">next update: ${next_update}</span>
+                </div>
+              `;
+          }
+          if (insertPosition === 'before') oldSection.before(newElement);
+          else if (insertPosition === 'replace') oldSection.replaceWith(newElement);
+          else oldSection.after(newElement);
+          console.log(`[renderTrafficStats] 插入新流量条目: ${serverName}，插入方式: ${insertPosition}`);
+        }
+      });
+    }
+ 
+    function updateTrafficStats(force = false) {
+      const now = Date.now();
+      if (!force && trafficCache && (now - trafficCache.timestamp < config.interval)) {
+        console.log('[updateTrafficStats] 使用缓存数据');
+        renderTrafficStats(trafficCache.data);
+        return;
+      }
+ 
+      console.log('[updateTrafficStats] 正在请求新数据...');
+      fetch('/api/v1/service')
+        .then(res => res.json())
+        .then(data => {
+          if (!data.success) {
+            console.warn('[updateTrafficStats] 请求成功但返回数据异常');
+            return;
+          }
+          console.log('[updateTrafficStats] 成功获取新数据');
+          const trafficData = data.data.cycle_transfer_stats;
+          trafficCache = {
+            timestamp: now,
+            data: trafficData
+          };
+          renderTrafficStats(trafficData);
+        })
+        .catch(err => console.error('[updateTrafficStats] 获取失败:', err));
+    }
+ 
+    function startPeriodicRefresh() {
+      if (!trafficTimer) {
+        console.log('[startPeriodicRefresh] 启动周期刷新任务');
+        trafficTimer = setInterval(() => {
+          updateTrafficStats();
+        }, config.interval);
+      }
+    }
+ 
+    function onDomChildListChange() {
+      console.log('[onDomChildListChange] 检测到DOM变化, 立即刷新');
+      updateTrafficStats();
+      if (!trafficTimer) {
+        console.log('[onDomChildListChange] 启动定时刷新');
+        startPeriodicRefresh();
+      }
+    }
+ 
+    const TARGET_SELECTOR = 'section.server-card-list, section.server-inline-list';
+ 
+    let currentSection = null;
+    let childObserver = null;
+ 
+    function observeSection(section) {
+      if (childObserver) {
+        childObserver.disconnect();
+        console.log('[监听] 断开旧的子节点监听');
+      }
+ 
+      currentSection = section;
+      console.log('[监听] 监听新的目标 section 子节点');
+ 
+      childObserver = new MutationObserver(mutations => {
+        for (const m of mutations) {
+          if (m.type === 'childList' && (m.addedNodes.length || m.removedNodes.length)) {
+            console.log('[监听] section 子节点变化，触发刷新');
+            onDomChildListChange();
+            break;
+          }
+        }
+      });
+ 
+      childObserver.observe(currentSection, { childList: true, subtree: false });
+      updateTrafficStats();
+    }
+ 
+    const sectionDetector = new MutationObserver(() => {
+      const section = document.querySelector(TARGET_SELECTOR);
+      if (section && section !== currentSection) {
+        observeSection(section);
+      }
+    });
+ 
+    const root = document.querySelector('main') || document.body;
+    sectionDetector.observe(root, { childList: true, subtree: true });
+    console.log('[初始化] 启动 sectionDetector, 持续监听 section 切换');
+ 
+    startPeriodicRefresh();
+ 
+    window.addEventListener('beforeunload', () => {
+      if (trafficTimer) clearInterval(trafficTimer);
+      if (childObserver) childObserver.disconnect();
+      sectionDetector.disconnect();
+      console.log('[清理] 卸载监听器和定时器');
+    });
+  })();
+  window.CustomDesc="哪吒云监控"//也可以替换为你想要替换的文字;
+  </script> </body> </html>
 
-.data-\[state\=unchecked\]\:bg-input[data-state=unchecked] { 
-  background-color: unset; 
-}
 
-/* ==========================================
-   LIGHT MODE 全量卡片：半透明、无模糊
-   ========================================== */
-.light .bg-card, 
-.light [class*="bg-card"],
-.light .max-w-5xl.gap-4>div:first-child {
-  font-family: "Roboto", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  position: relative !important;
-  
-  /* 恢复为漂亮的半透明乳白，同时彻底切断 iOS 的模糊滤镜 */
-  background: var(--custom-background-color) !important;
-  background-color: var(--custom-background-color) !important;
-  border: 1px solid var(--custom-border-color) !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px var(--custom-boxshadow-color) !important;
-  -webkit-transform: none !important;
-  transform: none !important;
-}
-
-.light .focus\:text-accent-foreground:focus { background-color: var(--custom-background-color) !important; }
-.light .text-muted-foreground { color: #000 !important; }
-.light\:bg-stone-700:is(.light *) { --tw-bg-opacity: 0.7 !important; }
-html.light * { border-color: var(--custom-border-color) !important; }
-
-html.light body {
-  color: #0b0a09 !important;
-  background: unset !important;
-  position: relative;
-}
-
-.border-neutral-200:is(.light *) { border-color: var(--custom-border-color) !important; }
-.fill-neutural-200\/50:is(.light *) { fill: var(--custom-background-color) !important; }
-.light .bg-stone-100 { background: var(--custom-background-color) !important; }
-.light\:text-stone-500:is(.light *) { color: #0b0a09 !important; }
-.light .bg-muted { background-color: var(--custom-border-color) !important; }
-.bg-white:is(.light *) { background-color: var(--custom-boxshadow-color) !important; }
-.light .bg-border { background-color: var(--custom-border-color) !important; }
-.light .border-input { border-color: var(--custom-border-color) !important; }
-.text-neutral-600\/50:is(.light *) { color: #666 !important; }
-.text-stone-400:is(.light *) { color: #000 !important; }
-
-/* 弹出菜单 */
-.light div#radix-\:r4\:, .light [id^="radix-"] {
-  background: var(--custom-background-color) !important;
-}
-
-.light .\[\&_\.recharts-cartesian-axis-tick_text\]\:fill-muted-foreground .recharts-cartesian-axis-tick text { fill: #000 !important; }
-.light .data-\[state\=checked\]\:bg-primary[data-state=checked] { background-color: var(--custom-background-color) !important; }
-.bg-neutral-100:is(.light *) { background-color: var(--custom-background-color) !important; }
-.light .bg-secondary { background-color: unset !important; }
-.light .bg-popover { background-color: var(--custom-boxshadow-color) !important; }
-.light .font-medium.opacity-40, .light .font-medium.opacity-50 { opacity: unset !important; }
-
-
-/* ==========================================
-   DARK MODE 全量卡片：半透明、无模糊
-   ========================================== */
-.dark .bg-card,
-.dark [class*="bg-card"],
-.dark .max-w-5xl.gap-4>div:first-child {
-  font-family: "Roboto", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  position: relative !important;
-  
-  /* 恢复为半透明暗色底框，同样切断模糊 */
-  background: var(--custom-background-color-dark) !important;
-  background-color: var(--custom-background-color-dark) !important;
-  border: 1px solid var(--custom-border-color-dark) !important;
-  -webkit-backdrop-filter: none !important;
-  backdrop-filter: none !important;
-  
-  border-radius: 15px;
-  overflow: hidden;
-  box-shadow: 0 4px 10px var(--custom-boxshadow-color-dark) !important;
-  -webkit-transform: none !important;
-  transform: none !important;
-}
-
-.dark .focus\:text-accent-foreground:focus { background-color: var(--custom-background-color-dark) !important; }
-.dark .text-muted-foreground { color: #fff !important; }
-.dark\:bg-stone-700:is(.dark *) { --tw-bg-opacity: 0.75 !important; }
-html.dark * { border-color: var(--custom-border-color-dark) !important; }
-
-html.dark body {
-  color: #f4f5f6 !important;
-  background: unset !important;
-  position: relative;
-}
-
-.dark\:border-neutral-800:is(.dark *) { border-color: var(--custom-border-color-dark) !important; }
-.dark\:fill-neutral-800:is(.dark *) { fill: var(--custom-background-color-dark) !important; }
-.dark .bg-stone-800 { background: var(--custom-background-color-dark) !important; }
-.dark\:text-stone-500:is(.dark *) { color: #f4f5f6 !important; }
-.dark .bg-muted { background-color: var(--custom-border-color-dark) !important; }
-.dark\:bg-black:is(.dark *) { background-color: var(--custom-boxshadow-color-dark) !important; }
-.dark .bg-border { background-color: var(--custom-border-color-dark) !important; }
-.dark .border-input { border-color: var(--custom-border-color-dark) !important; }
-.dark\:text-neutral-300\/50:is(.dark *) { color: #999 !important; }
-.dark\:text-stone-400:is(.dark *) { color: #fff !important; }
-
-/* 深色弹出菜单 */
-.dark div#radix-\:r4\:, .dark [id^="radix-"] {
-  background: var(--custom-background-color-dark) !important;
-}
-
-.dark .\[\&_\.recharts-cartesian-axis-tick_text\]\:fill-muted-foreground .recharts-cartesian-axis-tick text { fill: #fff !important; }
-.dark .data-\[state\=checked\]\:bg-primary[data-state=checked] { background-color: var(--custom-background-color-dark) !important; }
-.bg-neutral-800:is(.dark *) { background-color: var(--custom-background-color-dark) !important; }
-.dark .bg-secondary { background-color: unset !important; }
-.dark .bg-popover { background-color: var(--custom-background-color-dark) !important; }
-.dark .font-medium.opacity-40, .dark .font-medium.opacity-50 { opacity: unset !important; }
+ref(APA): 万毒不侵.万毒不侵.https://blog.wdsky.top. Retrieved 2026/5/31.
