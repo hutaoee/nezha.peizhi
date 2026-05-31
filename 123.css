@@ -1,1 +1,173 @@
-12213
+:root {
+  --custom-border-color: #e2e8f0 !important;
+  --custom-boxshadow-color: rgba(0, 0, 0, 0.08) !important;
+  --custom-background-color: #ffffff !important;
+  
+  --custom-border-color-dark: #2d3748 !important;
+  --custom-boxshadow-color-dark: rgba(0, 0, 0, 0.3) !important;
+  --custom-background-color-dark: #1a1a1a !important;
+  --custom-background-image: unset !important;
+}
+
+/* ==========================================
+   【终极强杀令】全网页所有模糊效果物理灭绝
+   ========================================== */
+*, *::before, *::after {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+}
+
+/* 针对 Tailwind CSS 常见模糊原子类的定向爆破 */
+[class*="backdrop-blur"], 
+[class*="bg-opacity"], 
+[class*="backdrop-opacity"] {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  filter: none !important;
+  --tw-backdrop-blur: unset !important;
+  --tw-backdrop-opacity: unset !important;
+}
+
+#root {
+  background-color: unset !important;
+}
+
+img {
+  border: none;
+}
+
+/* 背景大图只允许变暗，绝对禁止产生任何模糊 */
+.dark .bg-cover::after { 
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: rgba(0, 0, 0, 0.4) !important; 
+}
+.light .bg-cover::after { 
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-color: rgba(255, 255, 255, 0.2) !important; 
+}
+
+.text-green-600 { color: rgb(34, 197, 94); }
+.bg-green-600 { background-color: rgb(34, 197, 94); }
+.vps-info { border-radius: 12px; padding: 12px; }
+img[alt="BackIcon"] { margin-right: 12px; }
+
+/* 顶部导航与搜索框 */
+.flex.items-center.gap-1.rounded-\[50px\].bg-stone-100.p-\[3px\].dark\:bg-stone-800 {
+  background-color: var(--custom-background-color) !important;
+}
+
+.data-\[state\=unchecked\]\:bg-input[data-state=unchecked] { 
+  background-color: unset; 
+}
+
+/* ==========================================
+   LIGHT MODE 全量锁死不透明纯白
+   ========================================== */
+.light .bg-card, 
+.light [class*="bg-card"],
+.light .max-w-5xl.gap-4>div:first-child {
+  font-family: "Roboto", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  position: relative !important;
+  background: #ffffff !important; /* 锁死纯白 */
+  background-color: #ffffff !important;
+  border: 1px solid var(--custom-border-color) !important;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px var(--custom-boxshadow-color) !important;
+  -webkit-transform: none !important;
+  transform: none !important;
+}
+
+.light .focus\:text-accent-foreground:focus { background-color: #ffffff !important; }
+.light .text-muted-foreground { color: #000 !important; }
+.light\:bg-stone-700:is(.light *) { --tw-bg-opacity: 1 !important; }
+html.light * { border-color: var(--custom-border-color) !important; }
+
+html.light body {
+  color: #0b0a09 !important;
+  background: unset !important;
+  position: relative;
+}
+
+.border-neutral-200:is(.light *) { border-color: var(--custom-border-color) !important; }
+.fill-neutural-200\/50:is(.light *) { fill: #ffffff !important; }
+.light .bg-stone-100 { background: #ffffff !important; }
+.light\:text-stone-500:is(.light *) { color: #0b0a09 !important; }
+.light .bg-muted { background-color: var(--custom-border-color) !important; }
+.bg-white:is(.light *) { background-color: #ffffff !important; }
+.light .bg-border { background-color: var(--custom-border-color) !important; }
+.light .border-input { border-color: var(--custom-border-color) !important; }
+.text-neutral-600\/50:is(.light *) { color: #666 !important; }
+.text-stone-400:is(.light *) { color: #000 !important; }
+
+/* 弹出菜单 */
+.light div#radix-\:r4\:, .light [id^="radix-"] {
+  background: #ffffff !important;
+}
+
+.light .\[\&_\.recharts-cartesian-axis-tick_text\]\:fill-muted-foreground .recharts-cartesian-axis-tick text { fill: #000 !important; }
+.light .data-\[state\=checked\]\:bg-primary[data-state=checked] { background-color: #ffffff !important; }
+.bg-neutral-100:is(.light *) { background-color: #ffffff !important; }
+.light .bg-secondary { background-color: unset !important; }
+.light .bg-popover { background-color: #ffffff !important; }
+.light .font-medium.opacity-40, .light .font-medium.opacity-50 { opacity: unset !important; }
+
+
+/* ==========================================
+   DARK MODE 全量锁死不透明纯黑
+   ========================================== */
+.dark .bg-card,
+.dark [class*="bg-card"],
+.dark .max-w-5xl.gap-4>div:first-child {
+  font-family: "Roboto", "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  position: relative !important;
+  background: #1a1a1a !important; /* 锁死纯黑 */
+  background-color: #1a1a1a !important;
+  border: 1px solid var(--custom-border-color-dark) !important;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px var(--custom-boxshadow-color-dark) !important;
+  -webkit-transform: none !important;
+  transform: none !important;
+}
+
+.dark .focus\:text-accent-foreground:focus { background-color: #1a1a1a !important; }
+.dark .text-muted-foreground { color: #fff !important; }
+.dark\:bg-stone-700:is(.dark *) { --tw-bg-opacity: 1 !important; }
+html.dark * { border-color: var(--custom-border-color-dark) !important; }
+
+html.dark body {
+  color: #f4f5f6 !important;
+  background: unset !important;
+  position: relative;
+}
+
+.dark\:border-neutral-800:is(.dark *) { border-color: var(--custom-border-color-dark) !important; }
+.dark\:fill-neutral-800:is(.dark *) { fill: #1a1a1a !important; }
+.dark .bg-stone-800 { background: #1a1a1a !important; }
+.dark\:text-stone-500:is(.dark *) { color: #f4f5f6 !important; }
+.dark .bg-muted { background-color: var(--custom-border-color-dark) !important; }
+.dark\:bg-black:is(.dark *) { background-color: #1a1a1a !important; }
+.dark .bg-border { background-color: var(--custom-border-color-dark) !important; }
+.dark .border-input { border-color: var(--custom-border-color-dark) !important; }
+.dark\:text-neutral-300\/50:is(.dark *) { color: #999 !important; }
+.dark\:text-stone-400:is(.dark *) { color: #fff !important; }
+
+/* 深色弹出菜单 */
+.dark div#radix-\:r4\:, .dark [id^="radix-"] {
+  background: #1a1a1a !important;
+}
+
+.dark .\[\&_\.recharts-cartesian-axis-tick_text\]\:fill-muted-foreground .recharts-cartesian-axis-tick text { fill: #fff !important; }
+.dark .data-\[state\=checked\]\:bg-primary[data-state=checked] { background-color: #1a1a1a !important; }
+.bg-neutral-800:is(.dark *) { background-color: #1a1a1a !important; }
+.dark .bg-secondary { background-color: unset !important; }
+.dark .bg-popover { background-color: #1a1a1a !important; }
+.dark .font-medium.opacity-40, .dark .font-medium.opacity-50 { opacity: unset !important; }
