@@ -1,479 +1,162 @@
-<!DOCTYPE html> 
-<html lang=“zh-CN”> 
-<head> 
-<meta charset=“UTF-8” /> 
-<meta name=“viewport” content=“width=device-width, initial-scale=1.0” /> <title>哪吒探针 + 鼠标碎玻璃特效+服务器页签流量显示</title>
- 
-<style> /* 设置全局字体为苹方，增加文字白色阴影增强可读性 */ * { font-family: ‘PingFang SC’, ‘Helvetica Neue’, Helvetica, Arial, sans-serif !important; font-size: 16px; text-shadow: 0px 0px 10px rgba(0, 0, 0, 0.9);-webkit-text-fill-color: white; }
- 
-/* 设置页面背景为一张图片，全屏覆盖 */
-html, body {
-  height: 100% !important;
-  background: url("替换为你想要自定义的图片地址") no-repeat center center fixed !important;
-  background-size: cover !important;
-  margin: 0;
+:root {
+  /* 基础边框与阴影色值微调 */
+  --custom-border-color: rgba(244, 244, 244, 0.2) !important;
+  --custom-boxshadow-color: rgba(0, 0, 0, 0.05) !important;
+  --custom-background-image: unset;
 }
-#root{
-    background-color: transparent !important;
+
+/* ==========================================
+   1. 字体与全局样式优化 (抖音体与去下划线)
+   ========================================== */
+@font-face {
+    font-family: 'Douyin Sans';
+    src: url('https://cdn.jsdelivr.net/gh/bytedance/fonts@main/DouyinSans/DouyinSansBold.ttf') format('truetype');
+    font-display: swap;
 }
-/* 卡片透明并带模糊效果 */
-.rounded-lg{
-    backdrop-filter: blur(4px)!important;
-  background-color: transparent !important;
-  box-shadow: none !important;
+* { 
+    font-family: 'Douyin Sans', sans-serif !important; 
 }
-.bg-white{
-    backdrop-filter: blur(4px)!important;
-  background-color: transparent !important;
-  box-shadow: none !important;
+
+#root {
+  background-color: unset !important;
 }
-.flex {
-    background-color: transparent !important;
-}
-.bg-card{
-    background-color: transparent !important;
-}
- 
-/* 替换左上角 Logo 图标 */
-img[src*="/apple-touch-icon.png"] {
-  content: url("替换为你想要使用的图标") !important;
-}
- 
-/* 去除页面底部页脚 */
-footer {
-  display: none !important;
-}
- 
-/* 主内容容器设置为半透明背景 */
-.el-container {
-  background-color: rgba(255, 255, 255, 0.7) !important;
-}
- 
-/* 卡片、弹窗等组件设置更高透明度的背景 */
-.el-card, .el-message-box, .el-dialog {
-  background-color: rgba(255, 255, 255, 0.9) !important;
-}
- 
-/* 深色文字设置白色阴影增强对比度 */
-.el-text, .el-button, .el-table, .el-form-item__label, .el-form-item__content, .el-menu-item, .el-submenu__title {
-  color: #333 !important;
-  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
-}
- 
-/* 浅色文字设置黑色阴影提升可视性 */
-.el-text-light, .el-button--text, .el-link {
-  color: #fff !important;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-}
- 
-/* 碎玻璃特效碎片样式 */
-.fragment {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background-color: rgba(255, 255, 255, 0.8);
-  clip-path: polygon(0 0, 100% 0, 100% 100%);
-  transform-origin: center;
-  animation: shatter 1.5s ease-out forwards;
-  pointer-events: none;
-}
- 
-/* 碎玻璃动画关键帧 */
-@keyframes shatter {
-  0% {
-    transform: translate(0, 0) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(var(--dx), var(--dy)) rotate(var(--angle)) scale(0.5);
-    opacity: 0;
-  }
-}
- 
-/* 返回顶部按钮样式 */
-#backToTop {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  z-index: 1000;
-  background-color: transparent;
-  color: white;
+
+img {
   border: none;
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  font-size: 24px;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  transition: opacity 0.3s, transform 0.3s;
-  display: none;
 }
-//覆写内容宽度
-.w-full {
-    max-width: 75rem !important;
-}
- 
-#backToTop:hover {
-  transform: scale(1.1);
-}
- 
-#backToTop::before {
-  content: "🚀";
-  font-size: 24px;
-  display: block;
-  line-height: 60px;
-  text-align: center;
-}
-  .mt-4.w-full.mx-auto > div {
-    display: none;
-  }
-</style>
- </head> 
-<body>
- 
-<!-- 返回顶部按钮 --> <button id=“backToTop”></button>
- 
-  <script>
-  //禁用动画小人
-    window.DisableAnimatedMan = true;
-    document.addEventListener('click', function(e) {
-      createShatterEffect(e.pageX, e.pageY);
-    });
- //点击碎片特效
-    function createShatterEffect(x, y) {
-      const fragmentCount = 20;
-      for (let i = 0; i < fragmentCount; i++) {
-        const fragment = document.createElement('div');
-        fragment.className = 'fragment';
-        
-        const angle = Math.random() * 360;
-        const distance = Math.random() * 200 + 50;
-        const dx = Math.cos((angle * Math.PI) / 180) * distance;
-        const dy = Math.sin((angle * Math.PI) / 180) * distance;
- 
-        fragment.style.left = `${x}px`;
-        fragment.style.top = `${y}px`;
-        fragment.style.setProperty('--dx', `${dx}px`);
-        fragment.style.setProperty('--dy', `${dy}px`);
-        fragment.style.setProperty('--angle', `${Math.random() * 720}deg`);
-        document.body.appendChild(fragment);
-        setTimeout(() => fragment.remove(), 1500);
-      }
-    }
-//隐藏数据
-const observer = new MutationObserver(mutations => {
-  document.querySelectorAll('span[data-current-value]').forEach(el => {
-    if(!el.dataset.processed) {
-      el.style.opacity = "0";
-      el.dataset.processed = true;
-    }
-  });
-});
-observer.observe(document.body, { childList: true, subtree: true });
-//卡面添加流量统计
-  window.ShowNetTransfer = "true";
-  ; (function () {
-    let trafficTimer = null;
-    let trafficCache = null;
- 
-    const config = {
-      showTrafficStats: true,
-      insertPosition: 'replace', // 可选：'after', 'before', 'replace'
-      interval: 60000,           // 60秒刷新周期
-      style: 1
-    };
- 
-    function formatFileSize(bytes) {
-      if (bytes === 0) return { value: '0', unit: 'B' };
-      const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
-      let unitIndex = 0;
-      let size = bytes;
-      while (size >= 1024 && unitIndex < units.length - 1) {
-        size /= 1024;
-        unitIndex++;
-      }
-      return {
-        value: size.toFixed(unitIndex === 0 ? 0 : 2),
-        unit: units[unitIndex]
-      };
-    }
- 
-    function calculatePercentage(used, total) {
-      used = Number(used);
-      total = Number(total);
-      if (used > 1e15 || total > 1e15) {
-        used /= 1e10;
-        total /= 1e10;
-      }
-      return (used / total * 100).toFixed(1);
-    }
- 
-    function formatDate(dateString) {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      });
-    }
- 
-    function safeSetTextContent(parent, selector, text) {
-      const el = parent.querySelector(selector);
-      if (el) {
-        el.textContent = text;
-      }
-    }
-    // 返回进度条颜色：绿色（0%）到红色（100%）
-    function getGradientColor(percentage) {
-      const clamp = (val, min, max) => Math.min(Math.max(val, min), max);
-      const lerp = (start, end, t) => Math.round(start + (end - start) * t);
-      const p = clamp(Number(percentage), 0, 100) / 100;
-      const startColor = { r: 16, g: 185, b: 129 }; // #10b981
-      const endColor = { r: 239, g: 68, b: 68 };  // #ef4444
-      const r = lerp(startColor.r, endColor.r, p);
-      const g = lerp(startColor.g, endColor.g, p);
-      const b = lerp(startColor.b, endColor.b, p);
-      return `rgb(${r}, ${g}, ${b})`;
-    }
- 
-    function renderTrafficStats(trafficData) {
-      const serverMap = new Map();
- 
-      for (const cycleId in trafficData) {
-        const cycle = trafficData[cycleId];
-        if (!cycle.server_name || !cycle.transfer) continue;
- 
-        for (const serverId in cycle.server_name) {
-          const serverName = cycle.server_name[serverId];
-          const transfer = cycle.transfer[serverId];
-          const max = cycle.max;
-          const from = cycle.from;
-          const to = cycle.to;
-          const next_update = cycle.next_update[serverId];
- 
-          if (serverName && transfer !== undefined && max && from && to) {
-            serverMap.set(serverName, {
-              id: serverId,
-              transfer: transfer,
-              max: max,
-              name: cycle.name,
-              from: from,
-              to: to,
-              next_update: next_update
-            });
-          }
-        }
-      }
- 
-      serverMap.forEach((serverData, serverName) => {
-        const targetElement = Array.from(document.querySelectorAll('section.grid.items-center.gap-2'))
-          .find(section => {
-            const firstText = section.querySelector('p.break-all.font-bold.tracking-tight.text-xs')?.textContent.trim();
-            return firstText === serverName;
-          });
-        if (!targetElement) {
-          //console.warn(`[renderTrafficStats] 未找到服务器 "${serverName}" (ID: ${serverData.id}) 的元素`);
-          return;
-        }
- 
-        const usedFormatted = formatFileSize(serverData.transfer);
-        const totalFormatted = formatFileSize(serverData.max);
-        const percentage = calculatePercentage(serverData.transfer, serverData.max);
-        const fromFormatted = formatDate(serverData.from);
-        const toFormatted = formatDate(serverData.to);
-        const next_update = new Date(serverData.next_update).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" });
-        const uniqueClassName = 'traffic-stats-for-server-' + serverData.id;
-        const progressColor = getGradientColor(percentage);
-        let insertPosition = config.insertPosition;
- 
-        const containerDiv = targetElement.closest('div');
-        if (!containerDiv) return;
- 
-        const existing = Array.from(containerDiv.querySelectorAll('.new-inserted-element')).find(el =>
-          el.classList.contains(uniqueClassName)
-        );
-        if (!config.showTrafficStats) {
-          if (existing) existing.remove();
-          return;
-        }
- 
-        if (existing) {
-          safeSetTextContent(existing, '.used-traffic', usedFormatted.value);
-          safeSetTextContent(existing, '.used-unit', usedFormatted.unit);
-          safeSetTextContent(existing, '.total-traffic', totalFormatted.value);
-          safeSetTextContent(existing, '.total-unit', totalFormatted.unit);
-          safeSetTextContent(existing, '.from-date', fromFormatted);
-          safeSetTextContent(existing, '.to-date', toFormatted);
-          safeSetTextContent(existing, '.percentage-value', percentage + '%');
-          safeSetTextContent(existing, '.next-update', `next update: ${next_update}`);
-          const progressBar = existing.querySelector('.progress-bar');
-          if (progressBar) {
-            progressBar.style.width = percentage + '%';
-            progressBar.style.backgroundColor = progressColor;
-          }
-          console.log(`[renderTrafficStats] 更新已存在的流量条目: ${serverName}`);
-        }
-        else {
-          let oldSection = containerDiv.querySelector('section.flex.items-center.w-full.justify-between.gap-1');
-          if (!oldSection) {
-            oldSection = containerDiv.querySelector('section.grid.items-center.gap-3');
-            insertPosition = 'after';
-          }
-          if (!oldSection) return;
- 
-          const newElement = document.createElement('div');
-          newElement.classList.add('space-y-1.5', 'new-inserted-element', uniqueClassName);
-          newElement.style.width = '100%';
-          if (config.style === 1) {
-            newElement.innerHTML = `
-                <div class="flex items-center justify-between">
-                  <div class="flex items-baseline gap-1">
-                    <span class="text-[10px] font-medium text-neutral-800 dark:text-neutral-200 used-traffic">${usedFormatted.value}</span>
-                    <span class="text-[10px] font-medium text-neutral-800 dark:text-neutral-200 used-unit">${usedFormatted.unit}</span>
-                    <span class="text-[10px] text-neutral-500 dark:text-neutral-400">/ </span>
-                    <span class="text-[10px] text-neutral-500 dark:text-neutral-400 total-traffic">${totalFormatted.value}</span>
-                    <span class="text-[10px] text-neutral-500 dark:text-neutral-400 total-unit">${totalFormatted.unit}</span>
-                  </div>
-                  <div class="text-[10px] font-medium text-neutral-600 dark:text-neutral-300">
-                    <span class="from-date">${fromFormatted}</span>
-                    <span class="text-neutral-500 dark:text-neutral-400">-</span>
-                    <span class="to-date">${toFormatted}</span>
-                  </div>
-                </div>
-                <div class="relative h-1.5">
-                  <div class="absolute inset-0 bg-neutral-100 dark:bg-neutral-800 rounded-full"></div>
-                  <div class="absolute inset-0 bg-emerald-500 rounded-full transition-all duration-300 progress-bar" style="width: ${percentage}%; background-color: ${progressColor};"></div>
-                </div>
-              `;
-          } else if (config.style === 2) {
-            newElement.innerHTML = `
-                <div class="flex items-center justify-between">
-                  <div class="flex items-baseline gap-1">
-                    <span class="text-[10px] font-medium text-neutral-800 dark:text-neutral-200 used-traffic">${usedFormatted.value}</span>
-                    <span class="text-[10px] font-medium text-neutral-800 dark:text-neutral-200 used-unit">${usedFormatted.unit}</span>
-                    <span class="text-[10px] text-neutral-500 dark:text-neutral-400">/ </span>
-                    <span class="text-[10px] text-neutral-500 dark:text-neutral-400 total-traffic">${totalFormatted.value}</span>
-                    <span class="text-[10px] text-neutral-500 dark:text-neutral-400 total-unit">${totalFormatted.unit}</span>
-                  </div>
-                  <span class="text-[10px] text-neutral-500 dark:text-neutral-400 percentage-value">${percentage}%</span>
-                </div>
-                <div class="relative h-1.5">
-                  <div class="absolute inset-0 bg-neutral-100 dark:bg-neutral-800 rounded-full"></div>
-                  <div class="absolute inset-0 bg-emerald-500 rounded-full transition-all duration-300 progress-bar" style="width: ${percentage}%; background-color: ${progressColor};"></div>
-                </div>
-                <div class="flex items-center justify-between">
-                  <div class="text-[10px] text-neutral-500 dark:text-neutral-400">
-                    <span class="from-date">${fromFormatted}</span>
-                    <span class="text-neutral-500 dark:text-neutral-400">-</span>
-                    <span class="to-date">${toFormatted}</span>
-                  </div>
-                  <span class="text-[10px] text-neutral-500 dark:text-neutral-400">next update: ${next_update}</span>
-                </div>
-              `;
-          }
-          if (insertPosition === 'before') oldSection.before(newElement);
-          else if (insertPosition === 'replace') oldSection.replaceWith(newElement);
-          else oldSection.after(newElement);
-          console.log(`[renderTrafficStats] 插入新流量条目: ${serverName}，插入方式: ${insertPosition}`);
-        }
-      });
-    }
- 
-    function updateTrafficStats(force = false) {
-      const now = Date.now();
-      if (!force && trafficCache && (now - trafficCache.timestamp < config.interval)) {
-        console.log('[updateTrafficStats] 使用缓存数据');
-        renderTrafficStats(trafficCache.data);
-        return;
-      }
- 
-      console.log('[updateTrafficStats] 正在请求新数据...');
-      fetch('/api/v1/service')
-        .then(res => res.json())
-        .then(data => {
-          if (!data.success) {
-            console.warn('[updateTrafficStats] 请求成功但返回数据异常');
-            return;
-          }
-          console.log('[updateTrafficStats] 成功获取新数据');
-          const trafficData = data.data.cycle_transfer_stats;
-          trafficCache = {
-            timestamp: now,
-            data: trafficData
-          };
-          renderTrafficStats(trafficData);
-        })
-        .catch(err => console.error('[updateTrafficStats] 获取失败:', err));
-    }
- 
-    function startPeriodicRefresh() {
-      if (!trafficTimer) {
-        console.log('[startPeriodicRefresh] 启动周期刷新任务');
-        trafficTimer = setInterval(() => {
-          updateTrafficStats();
-        }, config.interval);
-      }
-    }
- 
-    function onDomChildListChange() {
-      console.log('[onDomChildListChange] 检测到DOM变化, 立即刷新');
-      updateTrafficStats();
-      if (!trafficTimer) {
-        console.log('[onDomChildListChange] 启动定时刷新');
-        startPeriodicRefresh();
-      }
-    }
- 
-    const TARGET_SELECTOR = 'section.server-card-list, section.server-inline-list';
- 
-    let currentSection = null;
-    let childObserver = null;
- 
-    function observeSection(section) {
-      if (childObserver) {
-        childObserver.disconnect();
-        console.log('[监听] 断开旧的子节点监听');
-      }
- 
-      currentSection = section;
-      console.log('[监听] 监听新的目标 section 子节点');
- 
-      childObserver = new MutationObserver(mutations => {
-        for (const m of mutations) {
-          if (m.type === 'childList' && (m.addedNodes.length || m.removedNodes.length)) {
-            console.log('[监听] section 子节点变化，触发刷新');
-            onDomChildListChange();
-            break;
-          }
-        }
-      });
- 
-      childObserver.observe(currentSection, { childList: true, subtree: false });
-      updateTrafficStats();
-    }
- 
-    const sectionDetector = new MutationObserver(() => {
-      const section = document.querySelector(TARGET_SELECTOR);
-      if (section && section !== currentSection) {
-        observeSection(section);
-      }
-    });
- 
-    const root = document.querySelector('main') || document.body;
-    sectionDetector.observe(root, { childList: true, subtree: true });
-    console.log('[初始化] 启动 sectionDetector, 持续监听 section 切换');
- 
-    startPeriodicRefresh();
- 
-    window.addEventListener('beforeunload', () => {
-      if (trafficTimer) clearInterval(trafficTimer);
-      if (childObserver) childObserver.disconnect();
-      sectionDetector.disconnect();
-      console.log('[清理] 卸载监听器和定时器');
-    });
-  })();
-  window.CustomDesc="哪吒云监控"//也可以替换为你想要替换的文字;
-  </script> </body> </html>
 
+/* 背景图片压暗处理 */
+.dark .bg-cover::after {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background-color: rgba(0, 0, 0, 0.45) !important;
+}
+.light .bg-cover::after {
+  content: ""; position: absolute; inset: 0; z-index: -1;
+  background-color: rgba(255, 255, 255, 0.25) !important;
+}
 
-ref(APA): 万毒不侵.万毒不侵.https://blog.wdsky.top. Retrieved 2026/5/31.
+.text-green-600 { color: rgb(34, 197, 94); }
+.bg-green-600 { background-color: rgb(34, 197, 94); }
+.vps-info { border-radius: 12px; padding: 12px; }
+img[alt="BackIcon"] { margin-right: 12px; }
+
+.data-\[state\=unchecked\]\:bg-input[data-state=unchecked] {
+  background-color: unset;
+}
+
+/* ==========================================
+   2. 融合借鉴：全平台全版本通杀卡片样式 (含扫光)
+   ========================================== */
+[class*="bg-card"], 
+.bottom-marquee, 
+.light .max-w-5xl.gap-4>div:first-child,
+.dark .max-w-5xl.gap-4>div:first-child {
+    backdrop-filter: blur(5px) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(3px) saturate(180%) !important;
+    border-radius: 16px !important;
+    position: relative !important;
+    overflow: hidden !important;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+}
+
+/* 浅色模式（白天）：借鉴的高饱和度轻薄感 */
+html.light [class*="bg-card"], 
+html.light .bottom-marquee,
+html.light .max-w-5xl.gap-4>div:first-child {
+    background-color: rgba(255, 255, 255, 0.28) !important; /* 精调白天通透度 */
+    border: 1px solid rgba(255, 255, 255, 0.4) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* 深色模式（夜间）：借鉴的完美深黑通透质感 */
+html.dark [class*="bg-card"], 
+html.dark .bottom-marquee,
+html.dark .max-w-5xl.gap-4>div:first-child {
+    background-color: rgba(15, 15, 15, 0.35) !important; /* 精调黑夜通透度 */
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* 动态扫光效果动画 - 自动适配浅色/深色 */
+[class*="bg-card"]::after,
+.max-w-5xl.gap-4>div:first-child::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -150%;
+    width: 100%; height: 100%;
+    transform: skewX(-30deg);
+    transition: left 0.8s ease-in-out;
+}
+html.light [class*="bg-card"]::after, html.light .max-w-5xl.gap-4>div:first-child::after {
+    background-image: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.3) 50%, rgba(255,255,255,0) 100%);
+}
+html.dark [class*="bg-card"]::after, html.dark .max-w-5xl.gap-4>div:first-child::after {
+    background-image: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+}
+
+[class*="bg-card"]:hover::after,
+.max-w-5xl.gap-4>div:first-child:hover::after { 
+    left: 150%; 
+}
+
+/* ==========================================
+   3. LIGHT MODE (浅色模式细节补全)
+   ========================================== */
+.light .focus\:text-accent-foreground:focus { background-color: rgba(255, 255, 255, 0.25); }
+.light .text-muted-foreground { color: #000 !important; }
+.light\:bg-stone-700:is(.light *) { --tw-bg-opacity: 0.25; }
+html.light * { border-color: rgba(0, 0, 0, 0.08); }
+html.light body { color: #0b0a09; background: unset; position: relative; }
+.border-neutral-200:is(.light *) { border-color: rgba(0, 0, 0, 0.08); }
+.fill-neutural-200\/50:is(.light *) { fill: rgba(255, 255, 255, 0.25); }
+.light .bg-stone-100 { background: rgba(255, 255, 255, 0.25); }
+.light\:text-stone-500:is(.light *) { color: #0b0a09; }
+.light .bg-muted { background-color: rgba(0, 0, 0, 0.05); }
+.bg-white:is(.light *) { background-color: rgba(255, 255, 255, 0.4); }
+.light .bg-border { background-color: rgba(0, 0, 0, 0.05); }
+.light .border-input { border-color: rgba(0, 0, 0, 0.08); }
+.text-neutral-600\/50:is(.light *) { color: #444; }
+.text-stone-400:is(.light *) { color: #000; }
+
+.light div#radix-\:r4\: {
+  background: rgba(255, 255, 255, 0.6);
+}
+.light .\[\&_\.recharts-cartesian-axis-tick_text\]\:fill-muted-foreground .recharts-cartesian-axis-tick text { fill: #000; }
+.light .data-\[state\=checked\]\:bg-primary[data-state=checked] { background-color: rgba(255, 255, 255, 0.5); }
+.bg-neutral-100:is(.light *) { background-color: rgba(255, 255, 255, 0.25); }
+.light .bg-secondary { background-color: unset; }
+.light .bg-popover { background-color: rgba(255, 255, 255, 0.5); }
+.light .font-medium.opacity-40, .light .font-medium.opacity-50 { opacity: unset; }
+
+/* ==========================================
+   4. DARK MODE (深色模式细节补全)
+   ========================================== */
+.dark .focus\:text-accent-foreground:focus { background-color: rgba(0, 0, 0, 0.35); }
+.dark .text-muted-foreground { color: #fff !important; }
+.dark\:bg-stone-700:is(.dark *) { --tw-bg-opacity: 0.35; }
+html.dark * { border-color: rgba(255, 255, 255, 0.08); }
+html.dark body { color: #f4f5f6; background: unset; position: relative; }
+.dark\:border-neutral-800:is(.dark *) { border-color: rgba(255, 255, 255, 0.08); }
+.dark\:fill-neutral-800:is(.dark *) { fill: rgba(0, 0, 0, 0.35); }
+.dark .bg-stone-800 { background: rgba(0, 0, 0, 0.35); }
+.dark\:text-stone-500:is(.dark *) { color: #f4f5f6; }
+.dark .bg-muted { background-color: rgba(255, 255, 255, 0.05); }
+.dark\:bg-black:is(.dark *) { background-color: rgba(0, 0, 0, 0.2); }
+.dark .bg-border { background-color: rgba(255, 255, 255, 0.08); }
+.dark .border-input { border-color: rgba(255, 255, 255, 0.08); }
+.dark\:text-neutral-300\/50:is(.dark *) { color: #aaa; }
+.dark\:text-stone-400:is(.dark *) { color: #fff; }
+
+.dark div#radix-\:r4\: {
+  background: rgba(15, 15, 15, 0.6);
+}
+.dark .\[\&_\.recharts-cartesian-axis-tick_text\]\:fill-muted-foreground .recharts-cartesian-axis-tick text { fill: #fff; }
+.dark .data-\[state\=checked\]\:bg-primary[data-state=checked] { background-color: rgba(0, 0, 0, 0.35); }
+.bg-neutral-800:is(.dark *) { background-color: rgba(0, 0, 0, 0.35); }
+.dark .bg-secondary { background-color: unset; }
+.dark .bg-popover { background-color: rgba(0, 0, 0, 0.3); }
+.dark .font-medium.opacity-40, .dark .font-medium.opacity-50 { opacity: unset; }
+
+/* 隐藏冗余元素 */
+footer, .site-footer { display: none !important; }
