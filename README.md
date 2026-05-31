@@ -3,12 +3,12 @@
 ###### 自用的探针更改 
 ```html
 <meta name="referrer" content="no-referrer">
-<script src="https://cdn.jsdelivr.net/gh/hutaoee/nezha.peizhi@main/nezha-style1.js"></script>
 <script>
   window.CustomBackgroundImage = 'https://cdn.nodeimage.com/i/vbJdp0cG72gEQuKfFkei3SyNN8juPBLx.jpg'
   window.CustomMobileBackgroundImage = 'https://cdn.nodeimage.com/i/vbJdp0cG72gEQuKfFkei3SyNN8juPBLx.jpg'
   window.CustomLogo = 'https://cdn.nodeimage.com/i/9aFClHrd6v9AGP77z9DeR2X6ZzG4yRwy.png'
   window.CustomDesc = '服务器监控'
+  window.ForceCardInline = true;  // 是否单行显示
   window.DisableAnimatedMan = "true";
   window.CustomLinks = '[{"link":"https://sms.788555.xyz/","name":"联系我"}]'
 </script>
@@ -31,4 +31,10 @@
 ###### 详情与网络 展示在一个页面
 ```html
 <script src="https://cdn.jsdelivr.net/gh/hutaoee/nezha.peizhi@main/nezha-custom.js"></script>
+```
+
+
+###### 自定义样式 字体 样式 模糊全局
+```html
+<script src="https://cdn.jsdelivr.net/gh/hutaoee/nezha.peizhi@main/nezha-style1.js"></script>
 ```
