@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         哪吒详情页直接展示网络波动卡片（适配新版HTML结构）
-// @version      2.1
-// @description  哪吒详情页直接展示网络波动卡片（适配新版HTML结构）
+// @version      2.2
+// @description  哪吒详情页直接展示网络波动卡片（修复网络卡片空白一直在刷新的问题）
 // @author       https://www.nodeseek.com/post-349102-1
 // @match        *://*/server/*
 // @grant        none
@@ -11,23 +11,17 @@
 (function () {
     'use strict';
 
-    // ======= 新版参数（选择器）更新区域 =======
-    
-    // 1. "网络" 按钮：定位文本为“网络”的标签，并向上找到可点击的父级 div
-    function getNetworkButton() {
-        const p = Array.from(document.querySelectorAll('p.whitespace-nowrap')).find(el => el.textContent.trim() === '网络');
-        return p ? p.closest('.cursor-pointer') : null;
+    // ======= 新版精确定位参数 =======
+    function getTabButtons() {
+        const pTags = Array.from(document.querySelectorAll('p.whitespace-nowrap'));
+        const detail = pTags.find(el => el.textContent.trim() === '详情')?.closest('.cursor-pointer');
+        const network = pTags.find(el => el.textContent.trim() === '网络')?.closest('.cursor-pointer');
+        return { detail, network };
     }
 
-    // 2. Tab 切换区域的 section 选择器（定位包含新版特殊背景类的外层包裹 div）
     const selectorTabSection = 'div:has(> .bg-stone-100\\/70), div:has(> .dark\\:bg-stone-800\\/70)';
-
-    // 3. 详情图表视图选择器
     const selectorDetailCharts = '.server-info > div:has(.server-charts)';
-
-    // 4. 网络图表视图选择器：紧跟在详情图表后面的 div 
     const selectorNetworkCharts = '.server-info > div:nth-of-type(3)';
-
     // =========================================
 
     let hasClicked = false;
@@ -37,13 +31,16 @@
         const detailDiv = document.querySelector(selectorDetailCharts);
         const networkDiv = document.querySelector(selectorNetworkCharts);
 
-        if (detailDiv) {
+        // 如果 React 把节点干掉了，我们要强制给它创造一个并存的环境
+        if (detailDiv && networkDiv) {
             detailDiv.style.setProperty('display', 'block', 'important');
-            console.log('[UserScript] 详情图表已显示');
-        }
-        if (networkDiv) {
             networkDiv.style.setProperty('display', 'block', 'important');
-            console.log('[UserScript] 网络图表已显示');
+            
+            // 关键：防止 React 的 Unmount 机制让图表彻底变成空白
+            // 强制让它们脱离 React 的 display 绑定
+            if (networkDiv.classList.contains('hidden')) {
+                networkDiv.classList.remove('hidden');
+            }
         }
     }
 
@@ -51,64 +48,64 @@
         const section = document.querySelector(selectorTabSection);
         if (section) {
             section.style.setProperty('display', 'none', 'important');
-            console.log('[UserScript] Tab 切换区域已隐藏');
         }
     }
 
     function tryClickNetworkButton() {
-        const btn = getNetworkButton(); // 使用新的动态文本选择器获取网络按钮
-        if (btn && !hasClicked) {
-            btn.click();
+        const { detail, network } = getTabButtons();
+        if (network && detail && !hasClicked) {
             hasClicked = true;
-            console.log('[UserScript] 已点击网络按钮');
-            setTimeout(forceBothVisible, 500);
-        }
-    }
-
-    function tryClickPeak(retryCount = 10, interval = 200) {
-        const peakBtn = document.querySelector('#Peak');
-        if (peakBtn) {
-            peakBtn.click();
-            console.log('[UserScript] 已点击 Peak 按钮');
-        } else if (retryCount > 0) {
-            setTimeout(() => tryClickPeak(retryCount - 1, interval), interval);
+            
+            // 核心修复逻辑：先去“网络”把真实的数据流拉起来
+            network.click();
+            console.log('[UserScript] 已切到网络加载真实数据...');
+            
+            setTimeout(() => {
+                // 点击 Peak 按钮
+                const peakBtn = document.querySelector('#Peak');
+                if (peakBtn) peakBtn.click();
+                
+                // 数据加载完成，瞬间切回“详情”，让详情组件也挂载
+                detail.click();
+                console.log('[UserScript] 已切回详情，准备强行双显...');
+                
+                // 切回后立即锁死双显，隐藏切换栏
+                setTimeout(() => {
+                    hideTabSection();
+                    forceBothVisible();
+                }, 100);
+                
+            }, 400); // 给网络组件 400ms 的初始化和建立 WebSocket 连接的时间
         }
     }
 
     const observer = new MutationObserver(() => {
-        const detailDiv = document.querySelector(selectorDetailCharts);
-        const networkDiv = document.querySelector(selectorNetworkCharts);
+        const { network } = getTabButtons();
+        if (network) {
+            const detailDiv = document.querySelector(selectorDetailCharts);
+            const networkDiv = document.querySelector(selectorNetworkCharts);
+            const isAnyDivVisible = !!(detailDiv || networkDiv);
 
-        const isDetailVisible = detailDiv && getComputedStyle(detailDiv).display !== 'none';
-        const isNetworkVisible = networkDiv && getComputedStyle(networkDiv).display !== 'none';
+            if (isAnyDivVisible && !divVisible) {
+                tryClickNetworkButton();
+            } else if (!isAnyDivVisible && divVisible) {
+                hasClicked = false;
+            }
 
-        const isAnyDivVisible = isDetailVisible || isNetworkVisible;
+            divVisible = isAnyDivVisible;
 
-        if (isAnyDivVisible && !divVisible) {
-            hideTabSection();
-            tryClickNetworkButton();
-            setTimeout(() => tryClickPeak(15, 200), 300);
-        } else if (!isAnyDivVisible && divVisible) {
-            hasClicked = false;
-        }
-
-        divVisible = isAnyDivVisible;
-
-        if (detailDiv && networkDiv) {
-            if (!isDetailVisible || !isNetworkVisible) {
+            if (hasClicked) {
                 forceBothVisible();
             }
         }
     });
 
-    const root = document.querySelector('#root');
+    const root = document.querySelector('#root') || document.body;
     if (root) {
         observer.observe(root, {
             childList: true,
-            attributes: true,
-            subtree: true,
-            attributeFilter: ['style', 'class']
+            subtree: true
         });
-        console.log('[UserScript] 观察器已启动');
+        console.log('[UserScript] 哪吒数据流修复版观察器已启动');
     }
 })();
